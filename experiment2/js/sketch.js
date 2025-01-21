@@ -49,9 +49,9 @@ function screenFull() {
 function draw() {
   // Setting up the kaleidoscope drawing portion
   translate(width / 2, height / 2);
-  stroke1 = ((mouseX * mouseX) + mouseX) / 710;
-  stroke2 = ((mouseY * mouseY) + mouseY) / 710;
-  stroke3 = ((mouseX * mouseY) + ((mouseX + mouseY) / 2)) / 710;
+  let stroke1 = ((mouseX * mouseX) + mouseX) / 710;
+  let stroke2 = ((mouseY * mouseY) + mouseY) / 710;
+  let stroke3 = ((mouseX * mouseY) + ((mouseX + mouseY) / 2)) / 710;
 
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     let mx = mouseX - width / 2;
