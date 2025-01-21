@@ -1,4 +1,6 @@
-// sketch.js - purpose and description here
+// sketch.js - The purpose of this sketch is to create a kaleidoscope that changes its color as it is drawn. The color values are determined off of a quadratic equation.
+// This site was used for reference for the kaleidoscope base. https://editor.p5js.org/p5/sketches/Interaction:_kaleidoscope
+// This site was used for inspiration for the color changing with position. https://editor.p5js.org/generative-design/sketches/P_1_1_2_01
 // Author: William Gonzalez
 // Date: 1/20/25
 
