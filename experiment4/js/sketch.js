@@ -252,14 +252,12 @@ Boid.prototype.cohesion = function (boids) {
   }
 }
 
-// Draw random diamonds
 function drawDiamonds() {
   let diamondSize = 20;
   noFill();
-  stroke(0); // Black border for the diamonds
+  stroke(0);
   strokeWeight(2);
 
-  // Draw diamonds at each random position
   for (let i = 0; i < diamonds.length; i++) {
     drawDiamond(diamonds[i].x, diamonds[i].y);
   }
@@ -268,7 +266,7 @@ function drawDiamonds() {
 function drawDiamond(x, y) {
   push();
   translate(x, y);
-  rotate(PI / 4); // Rotate to form a diamond
+  rotate(PI / 4);
   beginShape();
   vertex(0, -10);
   vertex(10, 0);
