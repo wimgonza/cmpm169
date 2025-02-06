@@ -1,4 +1,4 @@
-// sketch.js - The purpose of this sketch is to create a canvas that has randomly falling snow, but when the left mouse button is pressed, the snowflakes will rotate around the cursor.
+// sketch.js - The purpose of this sketch is to create a canvas that has birds moving, but the birds change colors when they get close to a square diamond.
 // This site was used for reference for the flocking base. https://editor.p5js.org/p5/sketches/Simulate:_SnowflakeParticleSystem
 // This site was used for inspiration for the birds changing color based off of distance. https://editor.p5js.org/generative-design/sketches/P_1_1_2_01
 // I used ChatGPT to help me code this.
@@ -10,6 +10,7 @@
 
 // Globals
 let flock;
+let diamonds = [];
 
 // setup() function is called once when the program starts
 function setup() {
@@ -19,14 +20,23 @@ function setup() {
   flock = new Flock();
   // Add an initial set of boids into the system
   for (let i = 0; i < 100; i++) {
-    let b = new Boid(width / 2,height / 2);
+    let b = new Boid(width / 2, height / 2);
     flock.addBoid(b);
+  }
+
+  for (let i = 0; i < 10; i++) {
+    let randX = random(width);
+    let randY = random(height);
+    diamonds.push(createVector(randX, randY));
   }
 }
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
   background(173, 216, 230);
+
+  drawDiamonds();
+
   flock.run();
 }
 
@@ -57,6 +67,7 @@ function Boid(x, y) {
   this.r = 3.0;
   this.maxspeed = 3;    // Maximum speed
   this.maxforce = 0.05; // Maximum steering force
+  this.bodyColor = color(100, 150, 255); // Default body color (light blue)
 }
 
 Boid.prototype.run = function(boids) {
@@ -110,15 +121,24 @@ Boid.prototype.seek = function(target) {
   return steer;
 }
 
-Boid.prototype.render = function() {
-  let d = dist(this.position.x, this.position.y, mouseX, mouseY);
+Boid.prototype.render = function () {
+  let closeToDiamond = false;
+  for (let i = 0; i < diamonds.length; i++) {
+    let d = dist(this.position.x, this.position.y, diamonds[i].x, diamonds[i].y);
+    if (d < 50) {
+      closeToDiamond = true;
+      break;
+    }
+  }
   
-  let colorValue = map(d, 0, width, 255, 0);
-  
-  let bodyColor = color(colorValue, 100, 100);
-  let wingTailColor = color(100, 255 - colorValue, 100);
-  
-  fill(bodyColor);
+  if (closeToDiamond) {
+    this.bodyColor = color(139, 0, 0);
+  } else {
+    this.bodyColor = color(100, 150, 255);
+  }
+
+  // Body color
+  fill(this.bodyColor);
   stroke(200);
   
   push();
@@ -132,6 +152,7 @@ Boid.prototype.render = function() {
   vertex(this.r, this.r * 2);
   endShape(CLOSE);
 
+  let wingTailColor = color(255, 100, 100);
   strokeWeight(2);
   stroke(wingTailColor);
   line(-this.r * 1.5, this.r * 1.5, -this.r * 2, this.r * 2);
@@ -143,22 +164,22 @@ Boid.prototype.render = function() {
 }
 
 // Wraparound
-Boid.prototype.borders = function() {
-  if (this.position.x < -this.r)  this.position.x = width + this.r;
-  if (this.position.y < -this.r)  this.position.y = height + this.r;
+Boid.prototype.borders = function () {
+  if (this.position.x < -this.r) this.position.x = width + this.r;
+  if (this.position.y < -this.r) this.position.y = height + this.r;
   if (this.position.x > width + this.r) this.position.x = -this.r;
   if (this.position.y > height + this.r) this.position.y = -this.r;
 }
 
 // Separation
 // Method checks for nearby boids and steers away
-Boid.prototype.separate = function(boids) {
+Boid.prototype.separate = function (boids) {
   let desiredseparation = 25.0;
   let steer = createVector(0, 0);
   let count = 0;
   // For every boid in the system, check if it's too close
   for (let i = 0; i < boids.length; i++) {
-    let d = p5.Vector.dist(this.position,boids[i].position);
+    let d = p5.Vector.dist(this.position, boids[i].position);
     // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
     if ((d > 0) && (d < desiredseparation)) {
       // Calculate vector pointing away from neighbor
@@ -187,12 +208,12 @@ Boid.prototype.separate = function(boids) {
 
 // Alignment
 // For every nearby boid in the system, calculate the average velocity
-Boid.prototype.align = function(boids) {
+Boid.prototype.align = function (boids) {
   let neighbordist = 50;
-  let sum = createVector(0,0);
+  let sum = createVector(0, 0);
   let count = 0;
   for (let i = 0; i < boids.length; i++) {
-    let d = p5.Vector.dist(this.position,boids[i].position);
+    let d = p5.Vector.dist(this.position, boids[i].position);
     if ((d > 0) && (d < neighbordist)) {
       sum.add(boids[i].velocity);
       count++;
@@ -212,12 +233,12 @@ Boid.prototype.align = function(boids) {
 
 // Cohesion
 // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
-Boid.prototype.cohesion = function(boids) {
+Boid.prototype.cohesion = function (boids) {
   let neighbordist = 50;
   let sum = createVector(0, 0);   // Start with empty vector to accumulate all locations
   let count = 0;
   for (let i = 0; i < boids.length; i++) {
-    let d = p5.Vector.dist(this.position,boids[i].position);
+    let d = p5.Vector.dist(this.position, boids[i].position);
     if ((d > 0) && (d < neighbordist)) {
       sum.add(boids[i].position); // Add location
       count++;
@@ -229,4 +250,30 @@ Boid.prototype.cohesion = function(boids) {
   } else {
     return createVector(0, 0);
   }
+}
+
+// Draw random diamonds
+function drawDiamonds() {
+  let diamondSize = 20;
+  noFill();
+  stroke(0); // Black border for the diamonds
+  strokeWeight(2);
+
+  // Draw diamonds at each random position
+  for (let i = 0; i < diamonds.length; i++) {
+    drawDiamond(diamonds[i].x, diamonds[i].y);
+  }
+}
+
+function drawDiamond(x, y) {
+  push();
+  translate(x, y);
+  rotate(PI / 4); // Rotate to form a diamond
+  beginShape();
+  vertex(0, -10);
+  vertex(10, 0);
+  vertex(0, 10);
+  vertex(-10, 0);
+  endShape(CLOSE);
+  pop();
 }
