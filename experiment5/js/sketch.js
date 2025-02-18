@@ -10,6 +10,7 @@
 
 // Globals
 let cam;
+let rotationSpeed = 0.01;
 
 // setup() function is called once when the program starts
 function setup() {
@@ -20,28 +21,42 @@ function setup() {
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  background(0); // Black background
+  background(0);
   let radius = width * 1.5;
 
-  //drag to move the world.
+  // Drag to move the world.
   orbitControl();
+  
+  rotateY(frameCount * rotationSpeed); 
 
   for (let i = 0; i <= 12; i++) {
     for (let j = 0; j <= 12; j++) {
       push();
       let a = (j / 12) * PI;
       let b = (i / 12) * PI;
-      translate(
-        sin(2 * a) * radius * sin(b),
-        (cos(b) * radius) / 2,
-        cos(2 * a) * radius * sin(b)
-      );
+      let x = sin(2 * a) * radius * sin(b);
+      let y = (cos(b) * radius) / 2;
+      let z = cos(2 * a) * radius * sin(b);
+
+      translate(x, y, z);
+      
+      rotateX(frameCount * rotationSpeed);
+      rotateY(frameCount * rotationSpeed);
+      rotateZ(frameCount * rotationSpeed);
+      
+      let red = map(x, -radius, radius, 0, 255);
+      let green = map(y, -radius / 2, radius / 2, 0, 255);
+      let blue = map(z, -radius, radius, 0, 255);
+      
+      let colorRed = map(sin(frameCount * 0.01 + x), -1, 1, 0, 255);
+      let colorGreen = map(cos(frameCount * 0.01 + y), -1, 1, 0, 255);
+      let colorBlue = map(sin(frameCount * 0.01 + z), -1, 1, 0, 255);
       
       if (j % 2 === 0) {
-        fill(0, 0, 255); // Blue color for cones
+        fill(colorRed, colorGreen, colorBlue);
         cone(30, 30);
       } else {
-        fill(128, 0, 128); // Purple color for boxes
+        fill(255 - colorRed, 255 - colorGreen, 255 - colorBlue);
         box(30, 30, 30);
       }
       pop();
