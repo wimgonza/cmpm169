@@ -13,7 +13,7 @@ var typedKey = 'a';
 var fontPath;
 
 var spacing = 20;
-var spaceWidth = 80; // width of letter ' '
+var spaceWidth = 80;
 var fontSize = 200;
 var lineSpacing = fontSize * 1.2;
 var textW = 0;
@@ -27,6 +27,9 @@ var font;
 var pnts;
 
 var freeze = false;
+
+var lastTime = 0;
+var strokeColor = [255, 255, 255];
 
 // setup() function is called once when the program starts
 function setup() {
@@ -52,7 +55,15 @@ function draw() {
   noFill();
   push();
 
-  // translation according the actual writing position
+  if (millis() - lastTime > 2000) {
+    // Change stroke color randomly
+    strokeColor = [random(255), random(255), random(255)];
+    lastTime = millis();
+  }
+
+  stroke(strokeColor);
+
+  // translation according to the actual writing position
   translate(letterX, letterY);
 
   // distortion on/off
@@ -67,9 +78,7 @@ function draw() {
       pnts[i].y += random(-stepSize, stepSize) * danceFactor;
     }
 
-    //  ------ lines: connected straight  ------
     strokeWeight(0.1);
-    stroke(255);
     beginShape();
     for (var i = 0; i < pnts.length; i++) {
       vertex(pnts[i].x, pnts[i].y);
@@ -77,23 +86,6 @@ function draw() {
     }
     vertex(pnts[0].x, pnts[0].y);
     endShape();
-
-    //  ------ lines: connected rounded  ------
-    /*
-      strokeWeight(0.08);
-
-      beginShape();
-      // start controlpoint
-      curveVertex(pnts[pnts.length-1].x, pnts[pnts.length-1].y);
-      // only these points are drawn
-      for (var i = 0; i < pnts.length; i++) {
-        curveVertex(pnts[i].x, pnts[i].y);
-      }
-      curveVertex(pnts[0].x, pnts[0].y);
-      // end controlpoint
-      curveVertex(pnts[1].x, pnts[1].y);
-      endShape();
-    */
   }
 
   pop();
@@ -138,7 +130,7 @@ function keyPressed() {
     break;
   case BACKSPACE:
   case DELETE:
-    background(255);
+    background(0);
     typedKey = '';
     pnts = getPoints(typedKey);
     letterX = 50;
@@ -151,16 +143,32 @@ function keyPressed() {
 
 function keyTyped() {
   if (keyCode >= 32) {
+    let oppositeKey = getOppositeLetter(key);
     if (keyCode == 32) {
       typedKey = '';
       letterX += textW + spaceWidth;
       pnts = getPoints(typedKey);
     } else {
-      typedKey = key;
+      typedKey = oppositeKey;
       letterX += textW + spacing;
       pnts = getPoints(typedKey);
     }
     freeze = false;
     loop();
   }
+}
+
+function getOppositeLetter(letter) {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+  const reverseAlphabet = 'zyxwvutsrqponmlkjihgfedcba';
+
+  if (alphabet.includes(letter)) {
+    const index = alphabet.indexOf(letter);
+    return reverseAlphabet[index];
+  }
+  else if (alphabet.toUpperCase().includes(letter)) {
+    const index = alphabet.toUpperCase().indexOf(letter);
+    return reverseAlphabet[index].toUpperCase();
+  }
+  return letter;
 }
