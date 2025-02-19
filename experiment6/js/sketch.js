@@ -34,7 +34,7 @@ function setup() {
   noLoop();
   background(0);
 
-  opentype.load('./data/FreeSansNoPunch.otf', function(err, f) {
+  opentype.load('experiment6/data/FreeSansNoPunch.otf', function(err, f) {
     if (err) {
       print(err);
     } else {
