@@ -1,6 +1,5 @@
-// sketch.js - The purpose of this sketch is to create a 3D space where the shapes will change color based on their position.
+// sketch.js - The purpose of this sketch is to create text that is the opposite of the key pressed with visual fx.
 // This site was used for reference for the text base. https://editor.p5js.org/generative-design/sketches/P_3_2_3_01
-// This site was used for inspiration for the shapes changing color off of the position. https://editor.p5js.org/generative-design/sketches/P_1_1_2_01
 // I used ChatGPT to help me code this.
 // Author: William Gonzalez
 // Date: 2/17/25
